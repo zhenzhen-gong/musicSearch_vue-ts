@@ -1,0 +1,72 @@
+<template>
+  <div id="app">
+    <div class="search-input">
+      <i class="iconfont icon-sousuo"></i>
+      <input type="text" placeholder="搜索歌曲" />
+      <i class="iconfont icon-chuyidong1-copy"></i>
+    </div>
+    <div class="search-history">
+      <div class="search-history-head">
+        <span>历史记录</span>
+        <i class="iconfont icon-shanchu"></i>
+      </div>
+      <div class="search-history-list">
+        <div>少年</div>
+        <div>如果遇见他</div>
+      </div>
+    </div>
+    <div class="search-hot">
+      <div class="search-hot-head">热搜榜</div>
+      <div class="search-hot-item">
+        <div class="search-hot-top">1</div>
+        <div class="search-hot-word">
+          <div>
+            少年 <i class="iconfont icon-remen"></i>
+          </div>
+          <div>“少年”这个词实在是太美了</div>
+        </div>
+        <span class="search-hot-count">2968644</span>
+      </div>
+      <div class="search-hot-item">
+        <div class="search-hot-top">2</div>
+        <div class="search-hot-word">
+          <div>
+            少年 <i class="iconfont icon-remen"></i>
+          </div>
+          <div>“少年”这个词实在是太美了</div>
+        </div>
+        <span class="search-hot-count">2968644</span>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script>
+import '@/assets/iconfont/iconfont.css'
+
+export default {
+  name: 'App',
+  
+} 
+ 
+ 
+</script>
+
+<style>
+.search-input { display: flex; align-items: center; height: 35px; margin: 35px 15px 25px 15px; background: #f7f7f7; border-radius: 25px;}
+.search-input i { margin: 0 13px;}
+.search-input input { flex: 1; font-size: 14px; border: none; background: #f7f7f7; outline: none;}
+.search-history { margin: 0px 15px 25px 15px; font-size: 14px;}
+.search-history-head { display: flex; justify-content: space-between; margin-bottom: 18px;}
+.search-history-list { display: flex; flex-wrap: wrap;}
+.search-history-list div { padding: 8px 14px; border-radius: 20px; margin-right: 15px; margin-bottom: 15px; background: #f7f7f7;}
+.search-hot { margin: 0 15px; font-size: 14px;}
+.search-hot-head { margin-bottom: 18px;}
+.search-hot-item {display: flex; align-items: center; margin-bottom: 29px;}
+.search-hot-top { color: #fb2222; width: 30px; margin-left: 4px;}
+.search-hot-word { flex: 1;}
+.search-hot-word div:nth-child(1) { font-size: 16px; color:black;}
+.search-hot-word div:nth-child(2) { font-size: 12px; color:#878787;}
+.search-hot-word i { height: 12px;}
+.search-hot-count { color: #878787;}
+</style>

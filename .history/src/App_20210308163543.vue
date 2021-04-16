@@ -1,6 +1,5 @@
 <template>
   <div id="app">
-    <HelloWorld/>
     <div class="search-input">
       <i class="iconfont icon-sousuo"></i>
       <input type="text" placeholder="搜索歌曲" v-model="searchWord" @input="handleToSuggest" @keyup.13="handleToList(searchWord)"/>
@@ -56,20 +55,12 @@
 import '@/assets/iconfont/iconfont.css'
 import axios from 'axios'
 import { reactive, ref, toRefs, onMounted, defineComponent, Ref } from '@vue/composition-api'
-import { provideStore } from './useSearchWord'
-import HelloWorld from './components/HelloWorld.vue'
 
 export default defineComponent({
   name: 'App',
-  components: {
-    HelloWorld
-  },
   setup() {
     const searchType = ref(1)
     const searchWord =ref('')
-    
-    provideStore(searchWord)
-
     const {searchHot} = useSearchHot()
     const { searchSuggest, handleToSuggest } = useSearchSuggest( searchType, searchWord)
     // const { searchList, handleToList, handleToClose } = useSearchList( searchType, searchWord) // 这样编写会报错，因为onMounted周期函数必须在setup()中执行，但是setToHistory这个函数所在的onMounted周期函数是在use函数中调用的
@@ -203,7 +194,7 @@ function useSearchHot() {
         }
       })
     }
-    const setToHistory = (word: string) => {
+    const setToHistory = ((word: string) => {
       state.searchHistoryList.unshift(word) //将搜索词插入数组最前面
       state.searchHistoryList = [...new Set(state.searchHistoryList)] //es6语法，过滤掉重复项
       if (state.searchHistoryList.length > 10) {

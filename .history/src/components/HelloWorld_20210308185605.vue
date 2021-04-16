@@ -1,7 +1,6 @@
 <template>
   <div class="hello">
     <h3>HelloWorld组件</h3>
-  <h2>count: {{this.$store.state.count}}</h2>
   </div>
 </template>
 

@@ -1,6 +1,5 @@
 <template>
   <div id="app">
-    <HelloWorld/>
     <div class="search-input">
       <i class="iconfont icon-sousuo"></i>
       <input type="text" placeholder="搜索歌曲" v-model="searchWord" @input="handleToSuggest" @keyup.13="handleToList(searchWord)"/>
@@ -56,20 +55,12 @@
 import '@/assets/iconfont/iconfont.css'
 import axios from 'axios'
 import { reactive, ref, toRefs, onMounted, defineComponent, Ref } from '@vue/composition-api'
-import { provideStore } from './useSearchWord'
-import HelloWorld from './components/HelloWorld.vue'
 
 export default defineComponent({
   name: 'App',
-  components: {
-    HelloWorld
-  },
   setup() {
     const searchType = ref(1)
     const searchWord =ref('')
-    
-    provideStore(searchWord)
-
     const {searchHot} = useSearchHot()
     const { searchSuggest, handleToSuggest } = useSearchSuggest( searchType, searchWord)
     // const { searchList, handleToList, handleToClose } = useSearchList( searchType, searchWord) // 这样编写会报错，因为onMounted周期函数必须在setup()中执行，但是setToHistory这个函数所在的onMounted周期函数是在use函数中调用的
@@ -77,7 +68,7 @@ export default defineComponent({
     const { searchList, handleToList, handleToClose } = useSearchList( 
       searchType, 
       searchWord, 
-      function(word: string) {
+      function(word: String) {
        setToHistory(word)
     })
     // 将setToHistory作为useSearchList中成功的回调函数执行
@@ -116,7 +107,7 @@ function useSearchHot() {
   /**
    * 搜索提示
    */
-  function useSearchSuggest(searchType: Ref<Number>, searchWord: Ref<string>) {
+  function useSearchSuggest(searchType: Ref<Number>, searchWord: Ref<String>) {
     const state = reactive({
       searchSuggest: []
     })
@@ -141,13 +132,13 @@ function useSearchHot() {
   /**
    * 搜索结果
    */
-  function useSearchList(searchType: Ref<Number>, searchWord: Ref<string>, callback: (w: string) => void) {
+  function useSearchList(searchType: Ref<Number>, searchWord: Ref<String>, callback: (w: String) => void) {
     const state = reactive({
       searchList: []
     })
     const {searchList} = toRefs(state)
 
-    const handleToList = (word: string) => {
+    const handleToList = ((word: String) => {
         searchWord.value = word
         callback(word)
         getSearchList()
@@ -180,7 +171,7 @@ function useSearchHot() {
   function useSearchHistoryList() {
     // 类型别名
     type Data = {
-      searchHistoryList: string[]
+      searchHistoryList: String[]
     }
     const state: Data = reactive({
       searchHistoryList: []
@@ -203,7 +194,7 @@ function useSearchHot() {
         }
       })
     }
-    const setToHistory = (word: string) => {
+    const setToHistory = ((word: String) => {
       state.searchHistoryList.unshift(word) //将搜索词插入数组最前面
       state.searchHistoryList = [...new Set(state.searchHistoryList)] //es6语法，过滤掉重复项
       if (state.searchHistoryList.length > 10) {
@@ -220,21 +211,14 @@ function useSearchHot() {
       setToHistory
     }
   }
-  // 参数是对象格式，写类型限制时用解构赋值的写法{ key, data }: {key: string, data: string[]}
-  function setStorage({ key, data }: { key: string, data: string[] }) {
+  function setStorage({ key, data }) {
      window.localStorage.setItem(key, JSON.stringify(data))
   }
-  function  getStorage({ key, success }: { key: string, success: (arg: []) => void }) {
+  function  getStorage({ key, success }) {
     let data = window.localStorage.getItem(key)
-    // success(JSON.parse(data)) //这里的data会报错，因为data的格式是string||null  而JSON.parse（null）是不对的
-    if (typeof data == 'string') {
-      success(JSON.parse(data))
-    }
-    else {
-      success([])
-    }
+    success(JSON.parse(data))
   }
-  function removeStorage({ key, success}: { key: string, success: () => void }) {
+  function removeStorage({ key, success}) {
     window.localStorage.removeItem(key)
     success()
   }

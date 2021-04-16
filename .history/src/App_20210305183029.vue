@@ -1,13 +1,12 @@
 <template>
   <div id="app">
-    <HelloWorld/>
     <div class="search-input">
       <i class="iconfont icon-sousuo"></i>
-      <input type="text" placeholder="搜索歌曲" v-model="searchWord" @input="handleToSuggest" @keyup.13="handleToList(searchWord)"/>
+      <input type="text" placeholder="搜索歌曲" v-model="searchWord" @input="handleToSuggest" @keyup.13="handleToList"/>
       <i class="iconfont icon-chuyidong1-copy" v-if="searchType !== 1" @click="handleToClose"></i>
     </div>
     <template v-if="searchType == 1">
-    <div class="search-history">
+    <!-- <div class="search-history">
       <div class="search-history-head">
         <span>历史记录</span>
         <i class="iconfont icon-shanchu" @click="handleToClear"></i>
@@ -15,7 +14,7 @@
       <div class="search-history-list">
         <div v-for="(item,index) in searchHistoryList" :key="index" @click="handleToList(item)">{{item}}</div>
       </div>
-    </div>
+    </div> -->
     <div class="search-hot">
       <div class="search-hot-head">热搜榜</div>
       <div class="search-hot-item" v-for="(item,index) in searchHot" :key="index">
@@ -52,35 +51,19 @@
   </div>
 </template>
 
-<script lang="ts">
+<script>
 import '@/assets/iconfont/iconfont.css'
 import axios from 'axios'
-import { reactive, ref, toRefs, onMounted, defineComponent, Ref } from '@vue/composition-api'
-import { provideStore } from './useSearchWord'
-import HelloWorld from './components/HelloWorld.vue'
+import { reactive, ref, toRefs, onMounted } from '@vue/composition-api'
 
-export default defineComponent({
+export default {
   name: 'App',
-  components: {
-    HelloWorld
-  },
   setup() {
     const searchType = ref(1)
     const searchWord =ref('')
-    
-    provideStore(searchWord)
-
     const {searchHot} = useSearchHot()
     const { searchSuggest, handleToSuggest } = useSearchSuggest( searchType, searchWord)
-    // const { searchList, handleToList, handleToClose } = useSearchList( searchType, searchWord) // 这样编写会报错，因为onMounted周期函数必须在setup()中执行，但是setToHistory这个函数所在的onMounted周期函数是在use函数中调用的
-    const { searchHistoryList, handleToClear, setToHistory } = useSearchHistoryList()
-    const { searchList, handleToList, handleToClose } = useSearchList( 
-      searchType, 
-      searchWord, 
-      function(word: string) {
-       setToHistory(word)
-    })
-    // 将setToHistory作为useSearchList中成功的回调函数执行
+    const { searchList, handleToList, handleToClose } = useSearchList( searchType, searchWord)
 
     return {
       searchType,
@@ -90,12 +73,10 @@ export default defineComponent({
       handleToSuggest,
       searchList,
       handleToList,
-      handleToClose,
-      searchHistoryList,
-      handleToClear
+      handleToClose
     }
   }
-})
+} 
 //------------------------------------------------------------------- vue3.0 use函数
 /**
  * 热门
@@ -116,7 +97,7 @@ function useSearchHot() {
   /**
    * 搜索提示
    */
-  function useSearchSuggest(searchType: Ref<Number>, searchWord: Ref<string>) {
+  function useSearchSuggest(searchType, searchWord) {
     const state = reactive({
       searchSuggest: []
     })
@@ -141,15 +122,14 @@ function useSearchHot() {
   /**
    * 搜索结果
    */
-  function useSearchList(searchType: Ref<Number>, searchWord: Ref<string>, callback: (w: string) => void) {
+  function useSearchList(searchType, searchWord) {
     const state = reactive({
       searchList: []
     })
     const {searchList} = toRefs(state)
 
-    const handleToList = (word: string) => {
-        searchWord.value = word
-        callback(word)
+    const handleToList = (word) => {
+        searchWord.value = word 
         getSearchList()
       
     }
@@ -168,77 +148,14 @@ function useSearchHot() {
        searchType.value = 1
     }
 
+    const 
    return {
      searchList,
      handleToList,
      handleToClose
    }
   }
-  /**
-   * 搜索历史
-   */
-  function useSearchHistoryList() {
-    // 类型别名
-    type Data = {
-      searchHistoryList: string[]
-    }
-    const state: Data = reactive({
-      searchHistoryList: []
-    })
-    const {searchHistoryList} = toRefs(state)
-
-    onMounted(() => {
-      getStorage({
-        key: 'searchHistory',
-        success: (data) => {
-          state.searchHistoryList = data
-        }
-      })
-    })
-    const handleToClear = () => {
-      removeStorage({
-        key: 'searchHistory',
-        success: () => {
-          state.searchHistoryList = []
-        }
-      })
-    }
-    const setToHistory = (word: string) => {
-      state.searchHistoryList.unshift(word) //将搜索词插入数组最前面
-      state.searchHistoryList = [...new Set(state.searchHistoryList)] //es6语法，过滤掉重复项
-      if (state.searchHistoryList.length > 10) {
-        state.searchHistoryList.length = 10
-      }
-      setStorage({
-        key: 'searchHistory',
-        data: state.searchHistoryList
-      })
-    }
-    return {
-      searchHistoryList,
-      handleToClear,
-      setToHistory
-    }
-  }
-  // 参数是对象格式，写类型限制时用解构赋值的写法{ key, data }: {key: string, data: string[]}
-  function setStorage({ key, data }: { key: string, data: string[] }) {
-     window.localStorage.setItem(key, JSON.stringify(data))
-  }
-  function  getStorage({ key, success }: { key: string, success: (arg: []) => void }) {
-    let data = window.localStorage.getItem(key)
-    // success(JSON.parse(data)) //这里的data会报错，因为data的格式是string||null  而JSON.parse（null）是不对的
-    if (typeof data == 'string') {
-      success(JSON.parse(data))
-    }
-    else {
-      success([])
-    }
-  }
-  function removeStorage({ key, success}: { key: string, success: () => void }) {
-    window.localStorage.removeItem(key)
-    success()
-  }
-
+ 
 </script>
 
 <style>

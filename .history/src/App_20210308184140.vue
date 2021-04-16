@@ -1,6 +1,5 @@
 <template>
   <div id="app">
-    <HelloWorld/>
     <div class="search-input">
       <i class="iconfont icon-sousuo"></i>
       <input type="text" placeholder="搜索歌曲" v-model="searchWord" @input="handleToSuggest" @keyup.13="handleToList(searchWord)"/>
@@ -57,7 +56,7 @@ import '@/assets/iconfont/iconfont.css'
 import axios from 'axios'
 import { reactive, ref, toRefs, onMounted, defineComponent, Ref } from '@vue/composition-api'
 import { provideStore } from './useSearchWord'
-import HelloWorld from './components/HelloWorld.vue'
+import HelloWorld from './components/HelloWorld'
 
 export default defineComponent({
   name: 'App',
